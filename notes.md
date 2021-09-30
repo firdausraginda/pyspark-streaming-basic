@@ -67,12 +67,12 @@ To be able to restart the application **exactly-once**, needs to follow these re
 - the application should be able to identify the duplicates, and take action upon it. Either to ignore it, or update the older copy of the same record
 
 #### Spark Options
-- Spark read from kafka source, need to specify source option: `.option("subscribe", "<topic_name>")`
-- **startingOffsets**, this option has 2 values:
-- Spark write to kafka source, need to specify the topic to write to: `.option("topic", "<topic_name>")`
+- Spark read from kafka source, need to specify topic to subsribce: `.option("subscribe", "<topic_name>")`
+- when read a kafka source, can specify the **startingOffsets** option, by default it set to **latest**, but can also set to **earliest**. Note that **startingOffsets** only applies when a new Streaming query is started, and that resuming will always pick up from where the query left off
+- Spark write to kafka source, need to specify topic to write to: `.option("topic", "<topic_name>")`
 - Both spark read & write, need to specify **kafka bootstarp server**: `.option("kafka.bootstrap.servers", "localhost:9092")`
 
 #### Transformations
-- `from_json()`:
-- `to_json()`:
-- `named_struct()`:
+- `from_json()`: convert a column with JSON string datatype, to a struct column (with pre-defined schema)
+- `to_json()`: convert a struct column to a JSON type
+- `named_struct()`: to create a struct with the given field names & values
