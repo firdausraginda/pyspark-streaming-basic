@@ -45,9 +45,9 @@ Spark streaming application consist of 3 steps:
 - The **submitted** time between job id 0 to 1, and job id 1 to 2 can be less than the **time limit interval** (if specified), this because spark still trying to align the trigger time to a round off time. But from job id 3 onwards, the duration should be more stable, follows the time limit interval
 
 ### Spark Output Modes
-- **Append** (insert only): Each micro-batch will **write new recods only**, this works when we don't want to update any previous output
-- **Update** (upsert): Will write either the **new records**, or the **old records that wants to be updated**. This works best when we want to implement upsert operation
-- **Complete** (overwrite): Will overwrite the complete results: **the old & new records**. So we will always get the entire results
+- **append** (insert only): Each micro-batch will **write new recods only**, this works when we don't want to update any previous output
+- **update** (upsert): Will write either the **new records**, or the **old records that wants to be updated**. This works best when we want to implement upsert operation
+- **complete** (overwrite): Will overwrite the complete results: **the old & new records**. So we will always get the entire results
 
 ### Fault Tolerance & Restarts
 The stream processing application should run forever, and will stop only because these following reasons: **failure** or **maintenance**. 
@@ -65,3 +65,14 @@ To be able to restart the application **exactly-once**, needs to follow these re
 - use a replayable source: use data source that allows us to re-read the incomplete micro-batch data
 - make sure the application logic produces the same results when given the same input data
 - the application should be able to identify the duplicates, and take action upon it. Either to ignore it, or update the older copy of the same record
+
+#### Spark Options
+- Spark read from kafka source, need to specify source option: `.option("subscribe", "<topic_name>")`
+- **startingOffsets**, this option has 2 values:
+- Spark write to kafka source, need to specify the topic to write to: `.option("topic", "<topic_name>")`
+- Both spark read & write, need to specify **kafka bootstarp server**: `.option("kafka.bootstrap.servers", "localhost:9092")`
+
+#### Transformations
+- `from_json()`:
+- `to_json()`:
+- `named_struct()`:
