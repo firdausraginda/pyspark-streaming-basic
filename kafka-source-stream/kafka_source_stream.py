@@ -49,6 +49,8 @@ if __name__ == "__main__":
         .load()
 
     # kafka_df.printSchema()
+    # res_df = kafka_df.select(col('value').cast('string'))
+    # res_df.show(5, False)
     value_df = kafka_df.select(from_json(col("value").cast("string"), schema).alias("value"))
     # value_df.printSchema()
     explode_df = value_df.selectExpr("value.InvoiceNumber", "value.CreatedTime", "value.PosID", "value.CustomerType",
