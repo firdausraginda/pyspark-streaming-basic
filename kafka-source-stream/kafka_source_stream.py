@@ -49,10 +49,11 @@ if __name__ == "__main__":
         .load()
 
     # kafka_df.printSchema()
-    # res_df = kafka_df.select(col('value').cast('string'))
-    # res_df.show(5, False)
+    # kafka_df.select(col('value').cast('string')).show(5, False) # by default, 'value' has binary data type, need to convert to string before show it
+    
     value_df = kafka_df.select(from_json(col("value").cast("string"), schema).alias("value"))
     # value_df.printSchema()
+    
     explode_df = value_df.selectExpr("value.InvoiceNumber", "value.CreatedTime", "value.PosID", "value.CustomerType",
                                     "value.PaymentMethod", "value.DeliveryType", "value.DeliveryAddress.City",
                                     "value.DeliveryAddress.State", "value.DeliveryAddress.PinCode", 
