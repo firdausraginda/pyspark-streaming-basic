@@ -68,7 +68,7 @@ To be able to restart the application **exactly-once**, needs to follow these re
 
 #### Spark Options
 - Spark read from kafka source, need to specify topic to subsribce: `.option("subscribe", "<topic_name>")`
-- when read a kafka source, can specify the **startingOffsets** option, by default it set to **latest**, but can also set to **earliest**. Note that **startingOffsets** only applies when a new Streaming query is started, and that resuming will always pick up from where the query left off
+- when read a kafka source, can specify the **startingOffsets** option: `.option("startingOffsets", "latest")`, by default this set to **latest**, but can also set to **earliest**. Note that **startingOffsets** only applies when a new streaming query is started, and that resuming will always pick up from where the query left off
 - Spark write to kafka source, need to specify topic to write to: `.option("topic", "<topic_name>")`
 - Both spark read & write, need to specify **kafka bootstarp server**: `.option("kafka.bootstrap.servers", "localhost:9092")`
 
