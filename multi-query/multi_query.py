@@ -52,3 +52,40 @@ if __name__ == '__main__':
 
     notification_df = value_df.select("value.InvoiceNumber", "value.CustomerCardNo", "value.TotalAmount") \
         .withColumn("EarnedLoyaltyPoints", expr("TotalAmount * 0.2"))
+
+    # kafka_target_df = notification_df.selectExpr("InvoiceNumber as key", "to_json(struct(*)) as value")
+    kafka_target_df = notification_df.select("InvoiceNumber".alias("key"), to_json(expr("struct(*)")).alias("value"))
+
+    notification_writer_query = kafka_target_df \
+        .writeStream \
+        .queryName("Notification Writer") \
+        .format("kafka") \
+        .option("kafka.bootstrap.servers", "localhost:9092") \
+        .option("topic", "notifications") \
+        .outputMode("append") \
+        .option("checkpointLocation", "chk-point-dir/notify") \
+        .start()
+
+    explode_df = value_df.selectExpr("value.InvoiceNumber", "value.CreatedTime", "value.StoreID",
+                                     "value.PosID", "value.CustomerType", "value.PaymentMethod", "value.DeliveryType",
+                                     "value.DeliveryAddress.City",
+                                     "value.DeliveryAddress.State", "value.DeliveryAddress.PinCode",
+                                     "explode(value.InvoiceLineItems) as LineItem")
+    
+    flattened_df = explode_df \
+        .withColumn("ItemCode", expr("LineItem.ItemCode")) \
+        .withColumn("ItemDescription", expr("LineItem.ItemDescription")) \
+        .withColumn("ItemPrice", expr("LineItem.ItemPrice")) \
+        .withColumn("ItemQty", expr("LineItem.ItemQty")) \
+        .withColumn("TotalValue", expr("LineItem.TotalValue")) \
+        .drop("LineItem")
+    
+    invoice_writer_query = flattened_df.writeStream \
+        .format("json") \
+        .queryName("Flattened Invoice Writer") \
+        .outputMode("append") \
+        .option("path", "output") \
+        .option("checkpointLocation", "chk-point-dir/flatten") \
+        .start()
+    
+    spark.streams.awaitAnyTermination()
