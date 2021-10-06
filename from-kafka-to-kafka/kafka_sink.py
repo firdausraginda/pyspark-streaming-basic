@@ -53,12 +53,24 @@ if __name__ == "__main__":
     notification_df = value_df.select("value.InvoiceNumber", "value.CustomerCardNo", "value.TotalAmount") \
         .withColumn("EarnedLoyaltyPoints", expr("TotalAmount * 0.2"))
 
+    # pyspark sql expression version
     kafka_target_df = notification_df.selectExpr("InvoiceNumber as key",
                                                 """to_json(named_struct(
                                                 'CustomerCardNo', CustomerCardNo,
                                                 'TotalAmount', TotalAmount,
-                                                'EarnedLoyaltyPoints', TotalAmount * 0.2)) as value""")                        
+                                                'EarnedLoyaltyPoints', TotalAmount * 0.2)) as value""")
     
+    # python version
+    # kafka_target_df = notification_df.select(col("InvoiceNumber").alias("key"),
+    #                                             to_json(expr("""
+    #                                                 named_struct(
+    #                                                     'CustomerCardNo', CustomerCardNo,
+    #                                                     'TotalAmount', TotalAmount,
+    #                                                     'EarnedLoyaltyPoints', EarnedLoyaltyPoints
+    #                                                 )
+    #                                                 """)).alias("value"))
+    # kafka_target_df.show(5, False) # debugging
+
     notification_writer_query = kafka_target_df \
         .writeStream \
         .queryName("Notification Writer") \
