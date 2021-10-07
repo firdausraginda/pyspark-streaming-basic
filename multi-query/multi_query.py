@@ -54,7 +54,7 @@ if __name__ == '__main__':
         .withColumn("EarnedLoyaltyPoints", expr("TotalAmount * 0.2"))
 
     # kafka_target_df = notification_df.selectExpr("InvoiceNumber as key", "to_json(struct(*)) as value")
-    kafka_target_df = notification_df.select("InvoiceNumber".alias("key"), to_json(expr("struct(*)")).alias("value"))
+    kafka_target_df = notification_df.select(col("InvoiceNumber").alias("key"), to_json(expr("struct(*)")).alias("value"))
 
     notification_writer_query = kafka_target_df \
         .writeStream \
