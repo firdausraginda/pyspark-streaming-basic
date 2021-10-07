@@ -69,9 +69,8 @@ To be able to restart the application **exactly-once**, needs to follow these re
 ### 10. Kafka Serialization & Deserialization
 
 #### deserialize
-- **string** format: convert it to a string should be enough.
-- **JSON** format: convert a JSON string to a JSON format, can be done using `from_json()`. Takes 2 args: the ***value*** & the ***schema***.
-- **CSV** format: convert CSV string to CSV format, using `from_csv()`. It works similar with `from_json()`. Takes 2 args: the ***value*** & the ***schema***. 
+- **JSON** format: convert a string to a JSON format, can be done using `from_json()`. Takes 2 args: the ***value*** & the ***schema***.
+- **CSV** format: convert a string to a CSV format, using `from_csv()`. It works similar with `from_json()`. Takes 2 args: the ***value*** & the ***schema***. 
 - **AVRO** format: For AVRO format, spark offers `from_avro()` function, but this takes more args. 
 
 #### serialize
@@ -80,10 +79,10 @@ To be able to restart the application **exactly-once**, needs to follow these re
 - **AVRO**: convert dataframe to an AVRO values, using `to_avro()`. 
 
 #### function definition
-- `from_json()`: create a struct column / dataframe from a JSON.
-- `to_json()`: create a JSON string from a struct column / dataframe.
-- `named_struct()`: create a struct / dataframe, the outcome of this function is used by `to_json()` for generating a JSON string. This function allow us to rename the selected columns.
-- `struct()`: create a struct / dataframe, the outcome of this function is used by `to_json()` for generating a JSON string. This function takes a list of selected columns but not allow us to rename it.
+- `from_json()`: create a JSON from a JSON string.
+- `to_json()`: create a JSON string from a dataframe.
+- `named_struct()`: create a dataframe, the outcome of this function is used by `to_json()` for generating a JSON string. This function allow us to rename the selected columns.
+- `struct()`: create a dataframe, the outcome of this function is used by `to_json()` for generating a JSON string. This function takes a list of selected columns but not allow us to rename it.
 
 ### 11. Spark Options
 - Spark read from kafka source, need to specify topic to subsribce: `.option("subscribe", "<topic_name>")`
