@@ -41,7 +41,7 @@ Spark streaming application consist of 3 steps:
 - **File source**: allows to read data from file with **json** or **parquet** or other format. In deal with file source, we can set the maximum files per trigger using `.option("maxFilesPerTrigger", 1)`. The processed source files in directory will negatively impact the micro-batch, hence needs to be cleaned, using `.option("cleanSource", "delete")`. 
 
 ### Spark Jobs
-- The spark jobs will start from the **0** job id, which inferring the schema, while the actual micro-batches start from job id **1**
+- The spark jobs will start from job id **0**, which inferring the schema, while the actual micro-batches start from job id **1**
 - The **submitted** time between job id 0 to 1, and job id 1 to 2 can be less than the **time limit interval** (if specified), this because spark still trying to align the trigger time to a round off time. But from job id 3 onwards, the duration should be more stable, follows the time limit interval
 
 ### Spark Output Modes
@@ -66,13 +66,27 @@ To be able to restart the application **exactly-once**, needs to follow these re
 - make sure the application logic produces the same results when given the same input data
 - the application should be able to identify the duplicates, and take action upon it. Either to ignore it, or update the older copy of the same record
 
+### Kafka Serialization & Deserialization
+
+##### deserialize
+- **string** format: convert it to a string should be enough.
+- **JSON** format: convert a JSON string to a JSON format, can be done using `from_json()`. Takes 2 args: the ***value*** & the ***schema***.
+- **CSV** format: convert CSV string to CSV format, using `from_csv()`. It works similar with `from_json()`. Takes 2 args: the ***value*** & the ***schema***. 
+- **AVRO** format: For AVRO format, spark offers `from_avro()` function, but this takes more args. 
+
+##### serialize
+- **JSON**: convert dataframe to a JSON values, using `to_json()`.
+- **CSV**: convert dataframe to a CSV values, using `to_csv()`.
+- **AVRO**: convert dataframe to an AVRO values, using `to_avro()`. 
+
+##### function definition
+- `from_json()`: create a struct column / dataframe from a JSON.
+- `to_json()`: create a JSON string from a struct column / dataframe.
+- `named_struct()`: create a struct / dataframe, the outcome of this function is used by `to_json()` for generating a JSON string. This function allow us to rename the selected columns.
+- `struct()`: create a struct / dataframe, the outcome of this function is used by `to_json()` for generating a JSON string. This function takes a list of selected columns but not allow us to rename it.
+
 #### Spark Options
 - Spark read from kafka source, need to specify topic to subsribce: `.option("subscribe", "<topic_name>")`
 - when read a kafka source, can specify the **startingOffsets** option: `.option("startingOffsets", "latest")`, by default this set to **latest**, but can also set to **earliest**. Note that **startingOffsets** only applies when a new streaming query is started, and that resuming will always pick up from where the query left off
 - Spark write to kafka source, need to specify topic to write to: `.option("topic", "<topic_name>")`
 - Both spark read & write, need to specify **kafka bootstarp server**: `.option("kafka.bootstrap.servers", "localhost:9092")`
-
-#### Transformations
-- `from_json()`: convert a column with JSON string datatype, to a struct column (with pre-defined schema)
-- `to_json()`: convert a struct column to a JSON type
-- `named_struct()`: to create a struct with the given field names & values
