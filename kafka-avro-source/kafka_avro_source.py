@@ -36,7 +36,6 @@ if __name__ == "__main__":
 
     rewards_writer_query = kafka_target_df.writeStream \
         .queryName("Rewards Writer") \
-        .queryName("Rewards Writer") \
         .format("kafka") \
         .option("kafka.bootstrap.servers", "localhost:9092") \
         .option("topic", "customer-rewards") \

@@ -90,3 +90,13 @@ To be able to restart the application **exactly-once**, needs to follow these re
 - when read a kafka source, can specify the **startingOffsets** option: `.option("startingOffsets", "latest")`, by default this set to **latest**, but can also set to **earliest**. Note that **startingOffsets** only applies when a new streaming query is started, and that resuming will always pick up from where the query left off
 - Spark write to kafka source, need to specify topic to write to: `.option("topic", "<topic_name>")`
 - Both spark read & write, need to specify **kafka bootstarp server**: `.option("kafka.bootstrap.servers", "localhost:9092")`
+
+### Pyspark SQL Functions
+- `map(func)`: return a new stream by passing each element of the source stream through a function *func*.
+- `flatMap(func)`: similar to map, but each input item can be mapped to 0 or more output items.
+- `filter(func)`: return a new stream by selecting only the records which  *func* return true.
+- `union(otherStream)`: return a new stream that contains the union of the elements in the source and other stream.
+- `reduce(func)`: return a new stream of single-element by aggregating the elements in each stream using function *func* (which takes 2 args and return 1). The function should associative & commutative so it can be computed in parallel.
+- `countByValue()`: return new stream of (K, Long) pairs where the value of each key is its frequency in each stream.
+- `reduceByKey(func, [numTasks])`: when called stream of (K, V) pairs, return new stream of (K, V) pairs where the value for each key are aggregated using the given reduce function.
+- `join(otherStream, [numTasks])`: when called on two streams of (K, V) & (K, W) pairs, return a new stream of (K, (V, W)) pairs with all pairs of elements for each key.
