@@ -69,9 +69,9 @@ To be able to restart the application **exactly-once**, needs to follow these re
 ### 10. Kafka Serialization & Deserialization
 
 #### deserialize
-- **JSON** format: convert a string to a JSON format, can be done using `from_json()`. Takes 2 args: the ***value*** & the ***schema***.
-- **CSV** format: convert a string to a CSV format, using `from_csv()`. It works similar with `from_json()`. Takes 2 args: the ***value*** & the ***schema***. 
-- **AVRO** format: For AVRO format, spark offers `from_avro()` function, but this takes more args. 
+- **JSON** format: convert a string to a JSON format, can be done using `from_json()`.
+- **CSV** format: convert a string to a CSV format, using `from_csv()`. It works similar with `from_json()`.
+- **AVRO** format: For AVRO format, spark offers `from_avro()` function.
 
 #### serialize
 - **JSON**: convert dataframe to a JSON values, using `to_json()`.
@@ -79,7 +79,8 @@ To be able to restart the application **exactly-once**, needs to follow these re
 - **AVRO**: convert dataframe to an AVRO values, using `to_avro()`. 
 
 #### function definition
-- `from_json()`: create a JSON from a JSON string.
+- `from_json()`: create a JSON from a JSON string. This func takes 2 args: the ***value*** & the ***schema***, the **value** needs to be a string.
+- `from_avro()`: create an AVRO values, this func takes 2 args: the ***value*** & the ***schema***. The **value** needs to be a binary type (kafka value default type), so don't need to convert to string.
 - `to_json()`: create a JSON string from a dataframe.
 - `named_struct()`: create a dataframe, the outcome of this function is used by `to_json()` for generating a JSON string. This function allow us to rename the selected columns.
 - `struct()`: create a dataframe, the outcome of this function is used by `to_json()` for generating a JSON string. This function takes a list of selected columns but not allow us to rename it.
