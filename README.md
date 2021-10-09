@@ -91,7 +91,7 @@ To be able to restart the application **exactly-once**, needs to follow these re
 - Spark write to kafka source, need to specify topic to write to: `.option("topic", "<topic_name>")`
 - Both spark read & write, need to specify **kafka bootstarp server**: `.option("kafka.bootstrap.servers", "localhost:9092")`
 
-### Pyspark SQL Functions
+### 12. Pyspark SQL Functions
 - `map(func)`: return a new stream by passing each element of the source stream through a function *func*.
 - `flatMap(func)`: similar to map, but each input item can be mapped to 0 or more output items.
 - `filter(func)`: return a new stream by selecting only the records which  *func* return true.
@@ -100,3 +100,13 @@ To be able to restart the application **exactly-once**, needs to follow these re
 - `countByValue()`: return new stream of (K, Long) pairs where the value of each key is its frequency in each stream.
 - `reduceByKey(func, [numTasks])`: when called stream of (K, V) pairs, return new stream of (K, V) pairs where the value for each key are aggregated using the given reduce function.
 - `join(otherStream, [numTasks])`: when called on two streams of (K, V) & (K, W) pairs, return a new stream of (K, (V, W)) pairs with all pairs of elements for each key.
+
+### 13. Stateless & Stateful Transformations
+
+Basically, **state** is a place to store historical data, but not all from the beginning of time, instead the **recent aggregated** data only. This act as reference to perform aggregation function, bc aggregation function needs to know the past result.
+
+| **Stateless** | **Stateful** |
+| --- | --- |
+| All of the **non-aggregation** functions e.g. `select()`, `filter()`, `map()`, `flatMap()`, `explode()` doesn't require the state, bc those functions doesn't needs to refer to the past value. | All **aggregation** functions e.g. ***grouping***, ***aggregation windowing***, & ***joins*** require state, bc needs to refer the past value. |
+| Doesn't support the **complete** output mode, only support **append** & **update** mode. | Support **complete** output mode. |
+| Dosen't have a memory issue | Excessive state causes out of memory. We can use the **managed stateful operations** for the **time-bound aggregations** which will clean the unused state based on time automatically. While the **un-managed stateful operations** suits for **continous aggregations**, since spark doesn't know when to clean the state so need to create custom cleanup logic, but, this **un-managed stateful operations** is not available on spark.3.0.0.
