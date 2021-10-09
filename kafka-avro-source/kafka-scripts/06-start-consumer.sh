@@ -1,0 +1,1 @@
+$KAFKA_HOME/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic customer-rewards --property print.key=true --property key.separator=":" --from-beginning
